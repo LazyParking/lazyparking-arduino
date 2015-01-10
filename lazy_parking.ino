@@ -36,28 +36,12 @@ char mensagem2[50];  //Mensagem a ser apresentada
 void setup() {
   Serial.begin (9600);
   vw_set_rx_pin(5); // Define o pino 5 do Arduino como entrada do pino de dados do receptor ASK
-  vw_setup(500);             // Bits por segundo
-  vw_rx_start();              // Inicializa o receptor
-  
-  
-  // **** IDENTIFICAÇAO DO DRONE ****
-  //            char mensagem[] = "{\"id_drone\":\"f45\",\"boxes\":[1, 2, 3, 4]}";
-  //            char mensagem2[] =  "";
-  //            apresentadados(mensagem,mensagem2);
-
-  //  //Inicializa a conexao ethernet e o servidor web 
-  // 
-  //  Ethernet.begin(mac, ip);
-  //    
-  //  // give the Ethernet shield a second to initialize:
-  //  delay(1000);
-
+  vw_setup(500);    // Bits por segundo
+  vw_rx_start();    // Inicializa o receptor
 }
 
 void loop() {
-
   //Inicializa a conexao ethernet e o servidor web 
-
   Ethernet.begin(mac, ip);
 
   // give the Ethernet shield a second to initialize:
@@ -80,11 +64,6 @@ void loop() {
         delay(100);
         contador++;
 
-       // char message[30];
-       // sprintf(buffer, "the current value is %d", i++);
-       // Serial.println(buffer);
-
-        //{"id_drone":"f45","id_box":"a2","avaiable":1}
         Serial.println("{\"boxId\":1,\"avaiable\":true}");
         char mensagem[] = "{\"boxId\":1,\"avaiable\":true}";
         apresentadados(mensagem);
@@ -108,9 +87,6 @@ void loop() {
   }
 }
 
-//  Teste Json 
-// { "id_drone": "1a2s3d", "boxes": [{ "id_box": "r4t5y6", "avaliable": 1 }] }
-// **** Rotina que recebe os valores de Mensagem e Mensagem2 e envia servidor ***** 
 void apresentadados(char msg[]) {
   // if there are incoming bytes available 
   // from the server, read them and print them:
@@ -140,13 +116,4 @@ void apresentadados(char msg[]) {
   //disconnect
   Serial.println("disconnecting");
   client.stop();
-
-  // if the server's disconnected, stop the client:
-  // if (!client.connected()) {
-  //   Serial.println();
-  //   Serial.println("server disconnected");
-  //   client.stop();
-  //   // do nothing:
-  //   while(true);
-  // }
 }
