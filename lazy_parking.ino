@@ -74,13 +74,6 @@ void sendToServer(String message) {
   char charMessage[message.length()];
   message.toCharArray(charMessage, message.length());
 
-  // if there are incoming bytes available 
-  // from the server, read them and print them:
-  if (client.available()) {
-    char c = client.read();
-    Serial.print(c);
-  }
-
   //connect to server
   Serial.println("connecting...");
   
@@ -92,6 +85,20 @@ void sendToServer(String message) {
     Serial.println("connection failed");
   }
   delay(1000);
+
+  // if there are incoming bytes available 
+  // from the server, read them and print them:
+  if (client.available()) {
+    String serverMessage;
+    char c;
+
+    do {
+      c = client.read();
+      serverMessage += char(c);
+    } while(c != -1);
+
+    Serial.print(serverMessage);
+  }
   
   if (client.connected()) {
     //send message to server
