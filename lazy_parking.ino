@@ -28,7 +28,8 @@ IPAddress server(192,168,0,55);
 EthernetClient client;
 
 int i = 0;
-int counter = 0;   
+int counter = 0;
+int droneId = 666;   
 
 void setup() {
   Serial.begin (9600);
@@ -53,30 +54,19 @@ void loop() {
     Serial.println("Recebido: ");
 
     for (int i = 0; i < msgLength; i++) {
-      // ****  TESTES DOS BOX QUE VIERAM DO TX ASK  ****
-      if (message[i] == '1'){    // define box ocupado
-        delay(100);
-        counter++;
-
-        String jsonData = "{\"boxId\":1,\"avaiable\":true}";
-        sendToServer(jsonData);
-        delay(100);
-      }
-
-      if (message[i] == '0') {    // define box livre
-        delay(100);
-        counter--;
-        String jsonData = "{\"boxId\":1,\"avaiable\":false}";
-        Serial.println(jsonData);
-        sendToServer(jsonData);
-        delay(100);
-      }
+      // ****  BOX QUE VIERAM DO TX ASK  ****
+      String jsonData = String("{\"droneId\":") + droneId
+        + String(",\"boxId\":") + i
+        + String(",\"avaiable\":")
+        + char(message[i]) + String("} ");
+      // counter++;
+      delay(100);
+      sendToServer(jsonData);
     }
 
-    Serial.println();
-    Serial.print("Vagas: ");
-    Serial.println(counter);
-    counter = 0;
+    // Serial.print("Vagas: ");
+    // Serial.println(counter);
+    // counter = 0;
   }
 }
 
