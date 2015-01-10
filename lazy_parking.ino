@@ -18,7 +18,7 @@ byte msgLength = VW_MAX_MESSAGE_LEN; // Armazena o tamanho das mensagens
 // Os valores abaixo definem o endereço IP, gateway e máscara. 
 // Configure de acordo com a sua rede.
 IPAddress ip(192,168,0,22);         //Define o endereço IP
-IPAddress gateway(192,168,0,1);    //Define o gateway
+IPAddress gateway(192,168,0,1);     //Define o gateway
 IPAddress subnet(255, 255, 255, 0); //Define a máscara de rede
 
 // Enter the IP address of the server you're connecting to:
@@ -28,10 +28,7 @@ IPAddress server(192,168,0,55);
 EthernetClient client;
 
 int i = 0;
-int contador = 0;   
-char mensagem[50];   //Mensagem a ser apresentada 
-char mensagem2[50];  //Mensagem a ser apresentada 
-
+int counter = 0;   
 
 void setup() {
   Serial.begin (9600);
@@ -56,38 +53,37 @@ void loop() {
     Serial.println("Recebido: ");
 
     for (int i = 0; i < msgLength; i++) {
-      //Serial.println(i);
-      Serial.write(message[i]);
-
       // ****  TESTES DOS BOX QUE VIERAM DO TX ASK  ****
       if (message[i] == '1'){    // define box ocupado
         delay(100);
-        contador++;
+        counter++;
 
-        Serial.println("{\"boxId\":1,\"avaiable\":true}");
-        char mensagem[] = "{\"boxId\":1,\"avaiable\":true}";
-        apresentadados(mensagem);
+        String jsonData = "{\"boxId\":1,\"avaiable\":true}";
+        sendToServer(jsonData);
         delay(100);
       }
 
       if (message[i] == '0') {    // define box livre
         delay(100);
-        contador--;
-        Serial.println("{\"boxId\":1,\"avaiable\":false}");
-        char mensagem[] = "{\"boxId\":1,\"avaiable\":false}";
-        apresentadados(mensagem);
+        counter--;
+        String jsonData = "{\"boxId\":1,\"avaiable\":false}";
+        Serial.println(jsonData);
+        sendToServer(jsonData);
         delay(100);
       }
     }
 
     Serial.println();
     Serial.print("Vagas: ");
-    Serial.println(contador);
-    contador = 0;
+    Serial.println(counter);
+    counter = 0;
   }
 }
 
-void apresentadados(char msg[]) {
+void sendToServer(String message) {
+  char charMessage[message.length()];
+  message.toCharArray(charMessage, message.length());
+
   // if there are incoming bytes available 
   // from the server, read them and print them:
   if (client.available()) {
@@ -108,9 +104,8 @@ void apresentadados(char msg[]) {
   delay(1000);
   
   if (client.connected()) {
-    delay(1000);
     //send message to server
-    client.print(msg);
+    client.print(charMessage);
   }
 
   //disconnect
