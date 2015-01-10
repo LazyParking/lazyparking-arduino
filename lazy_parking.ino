@@ -44,98 +44,88 @@ void setup() {
 //            char mensagem[] = "{\"id_drone\":\"f45\",\"boxes\":[1, 2, 3, 4]}";
 //            char mensagem2[] =  "";
 //            apresentadados(mensagem,mensagem2);
-  
+
 //  //Inicializa a conexao ethernet e o servidor web 
 // 
 //  Ethernet.begin(mac, ip);
 //    
 //  // give the Ethernet shield a second to initialize:
 //  delay(1000);
-     
- }
- 
+
+}
+
 void loop() {
-  
-    //Inicializa a conexao ethernet e o servidor web 
- 
+
+  //Inicializa a conexao ethernet e o servidor web 
+
   Ethernet.begin(mac, ip);
-    
+
   // give the Ethernet shield a second to initialize:
   delay(1000);
   
-    Serial.println("connecting...");
+  Serial.println("connecting...");
   
-    // if you get a connection, report back via serial:
-    if (client.connect(server, 3030)) {
-      Serial.println("connected");
-    } 
-    else {
-      // if you didn't get a connection to the server:
-      Serial.println("connection failed");
-    }
-    delay(1000);
-  
+  // if you get a connection, report back via serial:
+  if (client.connect(server, 3030)) {
+    Serial.println("connected");
+  } else {
+    // if you didn't get a connection to the server:
+    Serial.println("connection failed");
+  }
+  delay(1000);
+
   // ***** RECEPTOR DADOS ASK  ******
+  uint8_t message[VW_MAX_MESSAGE_LEN];    
+  uint8_t msgLength = VW_MAX_MESSAGE_LEN; 
   
-    uint8_t message[VW_MAX_MESSAGE_LEN];    
-    uint8_t msgLength = VW_MAX_MESSAGE_LEN; 
-  
-  if (vw_get_message(message, &msgLength)) // Non-blocking
-    {
-      Serial.println("Recebido: ");
-  
-        for (int i = 0; i < msgLength; i++)
-        {
-          //Serial.println(i);
-          Serial.write(message[i]);
-                             
-          // ****  TESTES DOS BOX QUE VIERAM DO TX ASK  ****
-            
-            if (message[i] == '1'){    // define box ocupado
-                delay(100);
-                contador++;
-                
-//                char message[30];
-//                sprintf(buffer, "the current value is %d", i++);
-//                Serial.println(buffer);
-                
-                
-                //{"id_drone":"f45","id_box":"a2","avaiable":1}
-                
-                 Serial.println("{\"boxId\":1,\"avaiable\":true}");
-                 char mensagem[] = "{\"boxId\":1,\"avaiable\":true}";
-                 char mensagem2[] =  "Box ocupado... ";
-                 apresentadados(mensagem,mensagem2);
-                 delay(100);   
-             }
-            if (message[i] == '0') {    // define box livre
-                delay(100);
-                contador--;
-                Serial.println("{\"boxId\":1,\"avaiable\":false}");
-                char mensagem[] = "{\"boxId\":1,\"avaiable\":false}";
-                char mensagem2[] =  "Box livre... ";
-                //char mensagem2[] = " { \"id_drone\": \"1a2s3d\", \"boxes\": [{ \"id_box\": \"r4t5y6\", \"avaliable\": 1 }] } ";
-                apresentadados(mensagem,mensagem2);
-                delay(100);   
-            }
-           
-        }
-      Serial.println();
-      Serial.print("Vagas: ");
-      Serial.println(contador);
-      contador = 0;
+  // Non-blocking
+  if (vw_get_message(message, &msgLength)) {
+    Serial.println("Recebido: ");
+
+    for (int i = 0; i < msgLength; i++) {
+      //Serial.println(i);
+      Serial.write(message[i]);
+
+      // ****  TESTES DOS BOX QUE VIERAM DO TX ASK  ****
+      if (message[i] == '1'){    // define box ocupado
+        delay(100);
+        contador++;
+
+       // char message[30];
+       // sprintf(buffer, "the current value is %d", i++);
+       // Serial.println(buffer);
+
+        //{"id_drone":"f45","id_box":"a2","avaiable":1}
+        Serial.println("{\"boxId\":1,\"avaiable\":true}");
+        char mensagem[] = "{\"boxId\":1,\"avaiable\":true}";
+        char mensagem2[] =  "Box ocupado... ";
+        apresentadados(mensagem,mensagem2);
+        delay(100);   
+      }
+
+      if (message[i] == '0') {    // define box livre
+        delay(100);
+        contador--;
+        Serial.println("{\"boxId\":1,\"avaiable\":false}");
+        char mensagem[] = "{\"boxId\":1,\"avaiable\":false}";
+        char mensagem2[] =  "Box livre... ";
+        //char mensagem2[] = " { \"id_drone\": \"1a2s3d\", \"boxes\": [{ \"id_box\": \"r4t5y6\", \"avaliable\": 1 }] } ";
+        apresentadados(mensagem,mensagem2);
+        delay(100);   
+      }
     }
-  
-} 
 
-  //  Teste Json 
-  // { "id_drone": "1a2s3d", "boxes": [{ "id_box": "r4t5y6", "avaliable": 1 }] }
+    Serial.println();
+    Serial.print("Vagas: ");
+    Serial.println(contador);
+    contador = 0;
+  }
+}
 
-
-  // **** Rotina que recebe os valores de Mensagem e Mensagem2 e envia servidor ***** 
-  
-void apresentadados(char msg[], char msg2[])  
-{
+//  Teste Json 
+// { "id_drone": "1a2s3d", "boxes": [{ "id_box": "r4t5y6", "avaliable": 1 }] }
+// **** Rotina que recebe os valores de Mensagem e Mensagem2 e envia servidor ***** 
+void apresentadados(char msg[], char msg2[]) {
   // if there are incoming bytes available 
   // from the server, read them and print them:
   if (client.available()) {
@@ -146,13 +136,12 @@ void apresentadados(char msg[], char msg2[])
   // as long as there are bytes in the serial queue,
   // read them and send them out the socket if it's open:
   
-    if (client.connected()) {
-      //Serial.print(msg);
-      delay(1000);
-      client.print(msg); 
-      
-    }
-  
+  if (client.connected()) {
+    //Serial.print(msg);
+    delay(1000);
+    client.print(msg); 
+  }
+
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
     Serial.println();
@@ -162,6 +151,3 @@ void apresentadados(char msg[], char msg2[])
     while(true);
   }
 }
-  
-
-
